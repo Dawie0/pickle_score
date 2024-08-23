@@ -4,21 +4,79 @@ import PlayerContext from '../contexts/PlayerContext';
 import ScoreUpdateModal from '../components/ScoreUpdateModal';
 
 const RosterTable = () => {
-  const { players, fetchPlayers } = useContext(PlayerContext);
+  const { players, fetchPlayers, generateTournament, tournament, fetchTournament } = useContext(PlayerContext);
   const [showModal, setShowModal] = useState(false);
+  const [selectedMatch, setSelectedMatch] = useState(0)
+  const [selectedGame, setSelectedGame] = useState(null);
 
   const playerList = Array.isArray(players) ? players : [];
 
-  const handleScoreUpdate = async ({ playerId, result, points }) => {
-    console.log('Updating player:', playerId, result, points);
-  
+  const handleGameClick = (match, game) => {
+    setSelectedGame(game);
+    setSelectedMatch(match.matchNumber)
+    setShowModal(true);
+  };
+
+
+  const handleScoreUpdate = async ({ team1Score, team2Score }) => {
     try {
-      const response = await axios.put(`http://localhost:5000/api/players/${playerId}/update`, {
-        result,
-        points,
+      const { team1, team2 } = selectedGame;
+
+      if (!Array.isArray(team1) || !Array.isArray(team2)) {
+        console.error('Error: team1 or team2 is not an array', { team1, team2 });
+        return;
+      }
+
+      // Determine winners and losers
+      const winningTeam = team1Score > team2Score ? team1 : team2;
+      const losingTeam = team1Score > team2Score ? team2 : team1;
+
+      console.log('Winning Team:', winningTeam);
+      console.log('Losing Team:', losingTeam);
+
+      // Update each player in the winning team
+      for (const player of winningTeam) {
+        
+        const playerName = playerList.find((p) => p.name === player);
+
+        await axios.put(`http://localhost:5000/api/players/${playerName._id}/update`, {
+          result: 'win',
+          points: team1Score > team2Score ? team1Score + 15 : team2Score + 15,
+        });
+      }
+
+      // Update each player in the losing team
+      for (const player of losingTeam) {
+
+        const playerName = playerList.find((p) => p.name === player);
+
+        await axios.put(`http://localhost:5000/api/players/${playerName._id}/update`, {
+          result: 'loss',
+          points: team1Score > team2Score ? team2Score : team1Score,
+        });
+
+        // If losing team score is greater than 11, add bonus points (commented out for now)
+        /*
+        if (losingTeamScore > 11) {
+          await axios.put(`http://localhost:5000/api/players/${playerName._id}/update`, {
+            result: 'loss',
+            points: // Add bonus points here,
+          });
+        }
+        */
+      }
+      
+
+      // Remove the game from the tournament
+      await axios.post(`http://localhost:5000/api/tournament/remove-game`, {
+        matchNumber: selectedMatch,
+        gameNumber: selectedGame.game_number,
       });
-      console.log('Update response:', response.data); // Log the response
-      fetchPlayers(); // Refresh the player list after updating
+
+      // Fetch updated player list
+      fetchPlayers();
+      fetchTournament()
+      setShowModal(false);
     } catch (error) {
       console.error('Error updating player score:', error.response || error.message);
     }
@@ -47,17 +105,79 @@ const RosterTable = () => {
           ))}
         </tbody>
       </table>
-      <button className="btn btn-primary" onClick={() => setShowModal(true)}>
-        Update Score
+      <button className="btn btn-primary" onClick={generateTournament}>
+        Generate Tournament
       </button>
-      <ScoreUpdateModal
-        show={showModal}
-        onHide={() => setShowModal(false)}
-        players={playerList}
-        onUpdate={handleScoreUpdate}
-      />
+
+      {tournament.length > 0 && (
+  <div className="matches mt-4">
+    {tournament.map((match) => (
+      <div key={match.matchNumber} className="match border p-3 mb-3">
+        <h4>Match {match.matchNumber}</h4>
+        
+        {/* Render Game 1 if it exists */}
+        {match.game1 && (
+          <div className="game border p-3 mb-3" onClick={() => handleGameClick(match, match.game1)}>
+            <h5>Game 1</h5>
+            <div className="row">
+              <div className="col">
+                <h6>Team 1</h6>
+                {match.game1.team1.map((player, i) => (
+                  <p key={i}>{player}</p>
+                ))}
+              </div>
+              <div className="col text-center">
+                <h2>VS</h2>
+              </div>
+              <div className="col">
+                <h6>Team 2</h6>
+                {match.game1.team2.map((player, i) => (
+                  <p key={i}>{player}</p>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+        
+        {/* Render Game 2 if it exists */}
+        {match.game2 && (
+          <div className="game border p-3 mb-3" onClick={() => handleGameClick(match, match.game2)}>
+            <h5>Game 2</h5>
+            <div className="row">
+              <div className="col">
+                <h6>Team 1</h6>
+                {match.game2.team3.map((player, i) => (
+                  <p key={i}>{player}</p>
+                ))}
+              </div>
+              <div className="col text-center">
+                <h2>VS</h2>
+              </div>
+              <div className="col">
+                <h6>Team 2</h6>
+                {match.game2.team4.map((player, i) => (
+                  <p key={i}>{player}</p>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    ))}
+  </div>
+)}
+
+{selectedGame && (
+  <ScoreUpdateModal
+    show={showModal}
+    onHide={() => setShowModal(false)} // Change `onClose` to `onHide`
+    onUpdate={handleScoreUpdate}
+    game={selectedGame} // Change `selectedGame` to `game`
+    matchNumber={selectedMatch}
+  />
+)}
     </div>
   );
-}
+};
 
 export default RosterTable;

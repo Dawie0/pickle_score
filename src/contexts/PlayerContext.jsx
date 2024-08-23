@@ -10,23 +10,58 @@ const PlayerContext = createContext({
 
 export const PlayerProvider = ({ children }) => {
   const [players, setPlayers] = useState([]);
+  const [tournament, setTournament] = useState([]);
 
   const fetchPlayers = async () => {
     try {
       const response = await axios.get('http://localhost:5000/api/players'); // Adjust URL as needed
-      setPlayers(response.data);
+      if (response.data.length === 0) {
+        console.log('No players found');
+        setPlayers([]); // Set players to an empty array
+      } else {
+        setPlayers(response.data);
+      }
     } catch (error) {
       console.error('Error fetching players:', error);
+    }
+  };
+
+  const fetchTournament = async () => {
+    try {
+      const response = await axios.get('http://localhost:5000/api/tournament'); // Adjust URL as needed
+      if (response.data.length === 0) {
+        console.log('No tournaments found');
+        setTournament([]); // Set tournament to an empty array
+      } else {
+        setTournament(response.data);
+      }
+    } catch (error) {
+      console.error('Error fetching players:', error);
+    }
+  }
+
+  const generateTournament = async () => {
+    try {
+      const response = await axios.post('http://localhost:5000/api/generate-tournament');
+      if (response.data.length === 0) {
+        console.log('No tournaments found');
+        setTournament([]); // Set tournament to an empty array
+      } else {
+        setTournament(response.data);
+      }
+    } catch (error) {
+      console.error('Error generating tournament:', error);
     }
   };
 
   // Fetch players from the server on component mount
   useEffect(() => {
     fetchPlayers();
+    fetchTournament();
   }, []);
 
   return (
-    <PlayerContext.Provider value={{ players, setPlayers, fetchPlayers }}>
+    <PlayerContext.Provider value={{ players, setPlayers, fetchPlayers, generateTournament, tournament, fetchTournament }}>
       {children}
     </PlayerContext.Provider>
   );
