@@ -14,24 +14,20 @@ const ScoreUpdateModal = ({ show, onHide, game, onUpdate }) => {
   }, [game]);
 
   const handleUpdate = () => {
-    console.log('Team 1 Score:', team1Score);
-    console.log('Team 2 Score:', team2Score);
     onUpdate({ team1Score, team2Score });
   };
 
   const handleTeam1ScoreChange = (e) => {
     const value = parseInt(e.target.value);
-    console.log('Team 1 Score Change:', value);
     setTeam1Score(isNaN(value) ? 0 : value); // Set to 0 if NaN
   };
   
   const handleTeam2ScoreChange = (e) => {
     const value = parseInt(e.target.value);
-    console.log('Team 2 Score Change:', value);
     setTeam2Score(isNaN(value) ? 0 : value); // Set to 0 if NaN
-  }
+  };
 
-  if (!game) return null;
+  if (!game || !game.team1 || !game.team2) return null; // Ensure teams are present
 
   return (
     <div className={`modal ${show ? 'show' : ''}`} style={{ display: show ? 'block' : 'none' }}>
@@ -47,7 +43,7 @@ const ScoreUpdateModal = ({ show, onHide, game, onUpdate }) => {
             <h6>Game: {game.game_number}</h6>
             <div>
               <h6>Team 1</h6>
-              {game.team1 && game.team1.map((player, i) => <p key={i}>{player}</p>)}
+              {game.team1.map((player, i) => <p key={i}>{player}</p>)}
               <input
                 type="number"
                 value={team1Score}
@@ -56,7 +52,7 @@ const ScoreUpdateModal = ({ show, onHide, game, onUpdate }) => {
             </div>
             <div>
               <h6>Team 2</h6>
-              {game.team2 && game.team2.map((player, i) => <p key={i}>{player}</p>)}
+              {game.team2.map((player, i) => <p key={i}>{player}</p>)}
               <input
                 type="number"
                 value={team2Score}

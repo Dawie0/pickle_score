@@ -13,9 +13,9 @@ const RegisterPlayerModal = ({ show, onHide }) => {
     e.preventDefault();
     setError(null);
     try {
-      await axios.post('http://localhost:5000/api/players', { name });
+      await axios.post('https://pickle-backend.vercel.app/api/players', { name });
       // Fetch updated players list
-      const response = await axios.get('http://localhost:5000/api/players');
+      const response = await axios.get('https://pickle-backend.vercel.app/api/players');
       setPlayers(response.data);
       setName('');
       onHide();

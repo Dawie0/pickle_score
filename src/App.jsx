@@ -1,7 +1,7 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Header from './components/Header';
 import RosterTable from './pages/RosterTable';
-import ScoreUpdatePage from './pages/ScoreUpdatePage';
+import ClearPage from './pages/clear';
 
 function App() {
   return (
@@ -9,7 +9,7 @@ function App() {
       <Header />
         <Routes>
           <Route path="/" element={<RosterTable />} />
-          <Route path="/update-score" element={<ScoreUpdatePage />} />
+          <Route path="/clear" element={<ClearPage />} />
         </Routes>
     </Router>
   );

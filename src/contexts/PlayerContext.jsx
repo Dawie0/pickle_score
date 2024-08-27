@@ -14,7 +14,7 @@ export const PlayerProvider = ({ children }) => {
 
   const fetchPlayers = async () => {
     try {
-      const response = await axios.get('http://localhost:5000/api/players'); // Adjust URL as needed
+      const response = await axios.get('https://pickle-backend.vercel.app/api/players'); // Adjust URL as needed
       if (response.data.length === 0) {
         console.log('No players found');
         setPlayers([]); // Set players to an empty array
@@ -28,7 +28,7 @@ export const PlayerProvider = ({ children }) => {
 
   const fetchTournament = async () => {
     try {
-      const response = await axios.get('http://localhost:5000/api/tournament'); // Adjust URL as needed
+      const response = await axios.get('https://pickle-backend.vercel.app/api/tournament'); // Adjust URL as needed
       if (response.data.length === 0) {
         console.log('No tournaments found');
         setTournament([]); // Set tournament to an empty array
@@ -36,13 +36,13 @@ export const PlayerProvider = ({ children }) => {
         setTournament(response.data);
       }
     } catch (error) {
-      console.error('Error fetching players:', error);
+      console.error('Error fetching tournament:', error);
     }
   }
 
   const generateTournament = async () => {
     try {
-      const response = await axios.post('http://localhost:5000/api/generate-tournament');
+      const response = await axios.post('https://pickle-backend.vercel.app/generate-tournament');
       if (response.data.length === 0) {
         console.log('No tournaments found');
         setTournament([]); // Set tournament to an empty array

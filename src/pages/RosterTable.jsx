@@ -12,8 +12,15 @@ const RosterTable = () => {
   const playerList = Array.isArray(players) ? players : [];
 
   const handleGameClick = (match, game) => {
-    setSelectedGame(game);
-    setSelectedMatch(match.matchNumber)
+    // Check if the game has team1/team2 or team3/team4 and normalize them
+    const normalizedGame = {
+      ...game,
+      team1: game.team1 || game.team3,
+      team2: game.team2 || game.team4,
+    };
+  
+    setSelectedGame(normalizedGame);
+    setSelectedMatch(match.matchNumber);
     setShowModal(true);
   };
 
@@ -39,7 +46,7 @@ const RosterTable = () => {
         
         const playerName = playerList.find((p) => p.name === player);
 
-        await axios.put(`http://localhost:5000/api/players/${playerName._id}/update`, {
+        await axios.put(`https://pickle-backend.vercel.app/api/players/${playerName._id}/update`, {
           result: 'win',
           points: team1Score > team2Score ? team1Score + 15 : team2Score + 15,
         });
@@ -50,7 +57,7 @@ const RosterTable = () => {
 
         const playerName = playerList.find((p) => p.name === player);
 
-        await axios.put(`http://localhost:5000/api/players/${playerName._id}/update`, {
+        await axios.put(`https://pickle-backend.vercel.app/api/players/${playerName._id}/update`, {
           result: 'loss',
           points: team1Score > team2Score ? team2Score : team1Score,
         });
@@ -58,7 +65,7 @@ const RosterTable = () => {
         // If losing team score is greater than 11, add bonus points (commented out for now)
         /*
         if (losingTeamScore > 11) {
-          await axios.put(`http://localhost:5000/api/players/${playerName._id}/update`, {
+          await axios.put(`https://pickle-backend.vercel.app/api/players/${playerName._id}/update`, {
             result: 'loss',
             points: // Add bonus points here,
           });
@@ -68,7 +75,7 @@ const RosterTable = () => {
       
 
       // Remove the game from the tournament
-      await axios.post(`http://localhost:5000/api/tournament/remove-game`, {
+      await axios.post(`https://pickle-backend.vercel.app/api/tournament/remove-game`, {
         matchNumber: selectedMatch,
         gameNumber: selectedGame.game_number,
       });
@@ -84,7 +91,7 @@ const RosterTable = () => {
   
   return (
     <div className="container mt-4">
-      <h2>Pickleball Roster</h2>
+      <h2>Rankings</h2>
       <table className="table table-striped">
         <thead>
           <tr>
