@@ -42,12 +42,13 @@ export const PlayerProvider = ({ children }) => {
 
   const generateTournament = async () => {
     try {
-      const response = await axios.post('https://pickle-backend.vercel.app/generate-tournament');
+      const response = await axios.post('https://pickle-backend.vercel.app/api/generate-tournament');
       if (response.data.length === 0) {
         console.log('No tournaments found');
         setTournament([]); // Set tournament to an empty array
       } else {
         setTournament(response.data);
+        fetchTournament()
       }
     } catch (error) {
       console.error('Error generating tournament:', error);

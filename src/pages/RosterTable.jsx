@@ -93,28 +93,40 @@ const RosterTable = () => {
     <div className="container mt-4">
       <h2>Rankings</h2>
       <table className="table table-striped">
-        <thead>
-          <tr>
-            <th>Name</th>
-            <th>Wins</th>
-            <th>Losses</th>
-            <th>Total Points</th>
-          </tr>
-        </thead>
-        <tbody>
-          {playerList.map((player) => (
-            <tr key={player._id}>
-              <td>{player.name}</td>
-              <td>{player.wins}</td>
-              <td>{player.losses}</td>
-              <td>{player.totalPoints}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+  <thead>
+    <tr>
+      <th>Rank</th>
+      <th>Name</th>
+      <th>Wins</th>
+      <th>Losses</th>
+      <th>Total Points</th>
+    </tr>
+  </thead>
+  <tbody>
+    {playerList
+      .slice()
+      .sort((a, b) => {
+        if (b.totalPoints !== a.totalPoints) {
+          return b.totalPoints - a.totalPoints;
+        }
+        return a.name.localeCompare(b.name);
+      })
+      .map((player, index) => (
+        <tr key={player._id}>
+          <td>{index + 1}</td>
+          <td>{player.name}</td>
+          <td>{player.wins}</td>
+          <td>{player.losses}</td>
+          <td>{player.totalPoints}</td>
+        </tr>
+      ))}
+  </tbody>
+</table>
+      {tournament.length < 1 && 
       <button className="btn btn-primary" onClick={generateTournament}>
         Generate Tournament
       </button>
+      }
 
       {tournament.length > 0 && (
   <div className="matches mt-4">

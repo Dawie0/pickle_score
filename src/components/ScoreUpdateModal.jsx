@@ -1,25 +1,28 @@
 /* eslint react/prop-types: 0 */
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 
 const ScoreUpdateModal = ({ show, onHide, game, onUpdate }) => {
   const [team1Score, setTeam1Score] = useState(0);
   const [team2Score, setTeam2Score] = useState(0);
 
-  useEffect(() => {
-    // Reset the scores when the game changes
-    if (game) {
-      setTeam1Score(0);
-      setTeam2Score(0);
-    }
-  }, [game]);
+  // useEffect(() => {
+  //   // Reset the scores when the game changes
+  //   if (game) {
+  //     setTeam1Score(0);
+  //     setTeam2Score(0);
+  //   }
+  // }, [game]);
 
   const handleUpdate = () => {
+    setTeam1Score(0);
+    setTeam2Score(0);
     onUpdate({ team1Score, team2Score });
   };
 
   const handleTeam1ScoreChange = (e) => {
     const value = parseInt(e.target.value);
     setTeam1Score(isNaN(value) ? 0 : value); // Set to 0 if NaN
+    // setTeam1Score(value)
   };
   
   const handleTeam2ScoreChange = (e) => {
