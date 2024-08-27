@@ -99,7 +99,7 @@ const RosterTable = () => {
       <th>Name</th>
       <th>Wins</th>
       <th>Losses</th>
-      <th>Total Points</th>
+      <th>Points</th>
     </tr>
   </thead>
   <tbody>
